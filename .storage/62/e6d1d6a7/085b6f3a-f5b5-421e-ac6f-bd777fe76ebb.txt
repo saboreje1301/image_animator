@@ -1,0 +1,85 @@
+$ mkdir -p public/assets/styles && mkdir -p public/assets/images
+$ cd /data/chats/oeky2/workspace/react_template && npm install && npm run lint && npm run dev
+
+npm notice 
+npm notice New major version of npm available! 10.2.4 -> 11.4.1
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v11.4.1>
+npm notice Run `npm install -g npm@11.4.1` to update!
+npm notice 
+npm ERR! Cannot read properties of null (reading 'matches')
+
+npm ERR! A complete log of this run can be found in: /root/.npm/_logs/2025-06-05T14_43_17_650Z-debug-0.log
+$ cd /data/chats/oeky2/workspace/react_template && npm init -y
+
+Wrote to /data/chats/oeky2/workspace/react_template/package.json:
+
+{
+  "name": "react-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint ./src --quiet",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.0.2",
+    "@supabase/supabase-js": "^2.47.12",
+    "@types/prop-types": "^15.7.14",
+    "prop-types": "^15.8.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.45",
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.1"
+  },
+  "description": "AnimateAI is a web application that converts static images to animated videos using cutting-edge AI technology. This project leverages multiple AI services and can be run with Google Colab's T4 GPU for optimal performance.",
+  "main": "eslint.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
+
+$ cd /data/chats/oeky2/workspace/react_template && npm install && npm run dev
+
+npm ERR! Cannot read properties of null (reading 'matches')
+
+npm ERR! A complete log of this run can be found in: /root/.npm/_logs/2025-06-05T14_43_41_657Z-debug-0.log
+$ cd /data/chats/oeky2/workspace && ls -la react_template/
+
+total 479203
+drwxr-xr-x 18792 root root 162906112 Jun  5 07:36 .
+drwxr-xr-x 18945 root root 164929536 Jun  5 07:43 ..
+drwxr-xr-x     4 root root     12288 Jun  5 07:36 .github
+-rw-r--r--     1 root root       253 Mar  5 03:46 .gitignore
+-rw-r--r--     1 root root       595 Jun  5 07:36 README.md
+drwxr-xr-x     5 root root     32768 Jun  5 07:38 colab
+-rw-r--r--     1 root root      1793 Jun  5 07:36 colab_app.ipynb
+-rw-r--r--     1 root root      1476 Mar  5 03:46 eslint.config.js
+-rw-r--r--     1 root root       308 Jun  4 21:03 index.html
+drwxr-xr-x 18739 root root 162516992 Jun  5 07:32 node_modules
+-rw-r--r--     1 root root      1284 Jun  5 07:43 package.json
+-rw-r--r--     1 root root    119234 Mar  5 03:46 pnpm-lock.yaml
+-rw-r--r--     1 root root        80 Mar  5 03:46 postcss.config.js
+drwxr-xr-x     9 root root     32768 Jun  5 07:40 public
+drwxr-xr-x    27 root root    143360 Jun  4 21:10 src
+-rw-r--r--     1 root root       170 Mar  5 03:46 tailwind.config.js
+-rw-r--r--     1 root root      1160 Mar  5 03:46 template_config.json
+-rw-r--r--     1 root root       163 Mar  5 03:46 vite.config.js

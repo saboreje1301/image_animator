@@ -1,0 +1,98 @@
+sequenceDiagram
+    participant User
+    participant UI as Frontend UI
+    participant API as Backend API
+    participant Queue as AnimationQueue
+    participant SM as AIServiceManager
+    participant AI as AIService
+    participant Worker as ProcessingWorker
+    participant FS as FileStorageManager
+    participant NS as NotificationService
+    
+    %% User upload flow
+    User->>UI: Upload image
+    UI->>API: POST /api/source-images
+    API->>FS: uploadFile(image, "source")
+    FS-->>API: imageUrl
+    API->>API: Create SourceImage object
+    API-->>UI: Return sourceImageId
+    UI->>UI: Display image preview
+    
+    %% Configuration flow
+    User->>UI: Configure animation settings
+    UI->>UI: Create AnimationConfig
+    UI->>API: GET /api/animation/compatible-services
+    API->>SM: getCompatibleServices(config)
+    SM-->>API: availableServices[]
+    API-->>UI: Display available AI services
+    
+    %% Animation creation
+    User->>UI: Click "Generate Animation"
+    UI->>API: POST /api/animations
+    API->>API: Create Animation object
+    API->>Queue: addToQueue(animation)
+    Queue-->>API: queuePosition
+    API-->>UI: animationId, queueStatus
+    UI->>NS: subscribeToAnimationStatus(animationId)
+    
+    %% Processing queue
+    Queue->>Queue: processNext()
+    Queue->>SM: selectService(animation.config)
+    SM->>SM: checkServiceStatus(services[])
+    SM-->>Queue: selectedService
+    Queue->>Worker: processAnimation(animation, selectedService)
+    
+    %% Image preprocessing
+    Worker->>FS: getFile(sourceImage.url)
+    FS-->>Worker: imageFile
+    Worker->>Worker: preprocessImage(imageFile, config)
+    Worker->>API: Update animation.status = PREPROCESSING
+    API->>NS: sendNotification(userId, "Preprocessing started")
+    NS-->>UI: Update animation status
+    
+    %% AI Service processing
+    Worker->>AI: processAnimation(preprocessedImage, config)
+    AI->>AI: internalProcessing()
+    AI-->>Worker: processingProgress updates
+    Worker->>API: Update animation.status = PROCESSING
+    API->>NS: sendNotification(userId, "Processing animation")
+    NS-->>UI: Display processing progress
+    
+    %% Animation completion
+    AI-->>Worker: rawAnimatedVideo
+    Worker->>Worker: optimizeVideo(rawAnimatedVideo, format)
+    Worker->>FS: uploadFile(video, "result")
+    FS-->>Worker: videoUrl
+    Worker->>API: Update animation with resultVideo
+    API->>API: Update animation.status = COMPLETED
+    API->>NS: sendNotification(userId, "Animation complete")
+    NS-->>UI: Show completion notification
+    UI->>UI: Enable download button
+    
+    %% Download and preview
+    User->>UI: Click preview
+    UI->>FS: getFile(resultVideo.url)
+    FS-->>UI: Display video preview
+    User->>UI: Click download
+    UI->>FS: generateSignedUrl(resultVideo.url)
+    FS-->>UI: signedDownloadUrl
+    UI-->>User: Download video file
+    
+    %% Error handling path
+    alt Service Unavailable
+        AI-->>Worker: Error: Service unavailable
+        Worker->>SM: reportServiceFailure(serviceId)
+        Worker->>SM: getAlternativeService(config)
+        SM-->>Worker: fallbackService
+        Worker->>AI: processAnimation(preprocessedImage, config) with fallbackService
+    end
+    
+    alt All Services Failed
+        Worker->>API: Update animation.status = FAILED
+        API->>NS: sendNotification(userId, "Animation failed")
+        NS-->>UI: Show failure message
+        UI->>UI: Enable retry option
+        User->>UI: Click retry
+        UI->>API: POST /api/animations/{id}/retry
+        API->>Queue: addToQueue(animation, priority=high)
+    end

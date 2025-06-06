@@ -1,0 +1,7 @@
+$ cd /data/chats/oeky2/workspace/react_template && find src/components -name "*.jsx" | sort
+src/components/ActionButtons.jsx
+src/components/Footer.jsx
+src/components/Header.jsx
+src/components/OptionsPanel.jsx
+src/components/PreviewSection.jsx
+src/components/UploadSection.jsx

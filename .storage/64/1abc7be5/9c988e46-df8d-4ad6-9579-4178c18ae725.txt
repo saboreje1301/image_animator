@@ -1,0 +1,14 @@
+$ cd /data/chats/oeky2/workspace/react_template && pnpm install react-dropzone axios
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 20, reused 18, downloaded 0, added 0
+Progress: resolved 229, reused 225, downloaded 1, added 0
+Progress: resolved 453, reused 393, downloaded 17, added 0
+Packages: +23
++++++++++++++++++++++++
+Progress: resolved 453, reused 393, downloaded 23, added 23, done
+
+dependencies:
++ axios 1.9.0
++ react-dropzone 14.3.8
+
+Done in 5.3s

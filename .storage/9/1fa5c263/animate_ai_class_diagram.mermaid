@@ -1,0 +1,213 @@
+classDiagram
+    class User {
+        +string id
+        +string email
+        +List~Project~ projects
+        +register(email: string, password: string): User
+        +login(email: string, password: string): AuthToken
+        +logout(token: AuthToken): boolean
+    }
+    
+    class AuthToken {
+        +string token
+        +DateTime expiresAt
+        +validate(): boolean
+        +refresh(): AuthToken
+    }
+    
+    class Project {
+        +string id
+        +string userId
+        +string name
+        +DateTime createdAt
+        +List~Animation~ animations
+        +create(name: string, userId: string): Project
+        +getAnimations(): List~Animation~
+        +delete(): boolean
+    }
+    
+    class Animation {
+        +string id
+        +string projectId
+        +string name
+        +AnimationStatus status
+        +DateTime createdAt
+        +DateTime updatedAt
+        +AnimationConfig config
+        +SourceImage sourceImage
+        +AnimatedVideo resultVideo
+        +create(sourceImage: SourceImage, config: AnimationConfig): Animation
+        +getStatus(): AnimationStatus
+        +cancel(): boolean
+        +delete(): boolean
+    }
+    
+    class SourceImage {
+        +string id
+        +string url
+        +string fileName
+        +string fileType
+        +int width
+        +int height
+        +int fileSize
+        +upload(file: File): SourceImage
+        +getPreprocessedVersions(): List~PreprocessedImage~
+        +delete(): boolean
+    }
+    
+    class PreprocessedImage {
+        +string id
+        +string sourceImageId
+        +string url
+        +string processingType
+        +create(sourceImage: SourceImage, processingType: string): PreprocessedImage
+    }
+    
+    class AnimatedVideo {
+        +string id
+        +string animationId
+        +string url
+        +string format
+        +int duration
+        +int width
+        +int height
+        +int fileSize
+        +VideoQuality quality
+        +download(): File
+        +getPreview(): string
+        +convertFormat(format: string): AnimatedVideo
+    }
+    
+    class AnimationConfig {
+        +string styleType
+        +float motionIntensity
+        +int duration
+        +VideoQuality quality
+        +Map~string, any~ advancedParams
+        +validate(): boolean
+        +getCompatibleServices(): List~AIService~
+    }
+    
+    class AIServiceManager {
+        +List~AIService~ availableServices
+        +selectService(config: AnimationConfig): AIService
+        +checkServiceStatus(serviceId: string): ServiceStatus
+        +registerService(service: AIService): boolean
+        +removeService(serviceId: string): boolean
+    }
+    
+    class AIService {
+        <<interface>>
+        +string id
+        +string name
+        +ServiceType type
+        +ServiceTier tier
+        +int rateLimitPerDay
+        +int usageCount
+        +List~string~ supportedStyles
+        +validateConfig(config: AnimationConfig): boolean
+        +processAnimation(image: SourceImage, config: AnimationConfig): Promise~AnimatedVideo~
+        +estimateProcessingTime(config: AnimationConfig): int
+        +checkAvailability(): ServiceStatus
+    }
+    
+    class StableVideoDiffusionService {
+        +processAnimation(image: SourceImage, config: AnimationConfig): Promise~AnimatedVideo~
+        +checkAvailability(): ServiceStatus
+    }
+    
+    class PikaLabsService {
+        +string apiKey
+        +processAnimation(image: SourceImage, config: AnimationConfig): Promise~AnimatedVideo~
+        +checkAvailability(): ServiceStatus
+    }
+    
+    class ColabNotebookService {
+        +string notebookUrl
+        +executeNotebook(image: SourceImage, config: AnimationConfig): Promise~AnimatedVideo~
+        +checkAvailability(): ServiceStatus
+    }
+    
+    class AnimationQueue {
+        +addToQueue(animation: Animation): string
+        +getQueuePosition(animationId: string): int
+        +processNext(): void
+        +cancelAnimation(animationId: string): boolean
+        +getEstimatedTime(animationId: string): int
+    }
+    
+    class ProcessingWorker {
+        +string workerId
+        +boolean isProcessing
+        +processAnimation(animation: Animation, service: AIService): AnimatedVideo
+        +handleError(error: Error, animation: Animation): void
+    }
+    
+    class FileStorageManager {
+        +uploadFile(file: File, type: string): string
+        +getFile(fileUrl: string): File
+        +deleteFile(fileUrl: string): boolean
+        +generateSignedUrl(fileUrl: string, expiresIn: int): string
+        +cleanupTempFiles(olderThan: DateTime): void
+    }
+    
+    class NotificationService {
+        +sendNotification(userId: string, message: string, type: string): void
+        +subscribeToAnimationStatus(animationId: string, callback: Function): void
+        +unsubscribe(subscriptionId: string): void
+    }
+    
+    %% Enums
+    class AnimationStatus {
+        <<enumeration>>
+        PENDING
+        PREPROCESSING
+        IN_QUEUE
+        PROCESSING
+        COMPLETED
+        FAILED
+        CANCELED
+    }
+    
+    class VideoQuality {
+        <<enumeration>>
+        LOW
+        MEDIUM
+        HIGH
+    }
+    
+    class ServiceType {
+        <<enumeration>>
+        API
+        COLAB
+        LOCAL
+    }
+    
+    class ServiceStatus {
+        <<enumeration>>
+        AVAILABLE
+        RATE_LIMITED
+        UNAVAILABLE
+        MAINTENANCE
+    }
+    
+    class ServiceTier {
+        <<enumeration>>
+        FREE
+        PREMIUM
+    }
+    
+    %% Relationships
+    User "1" -- "*" Project : owns
+    Project "1" -- "*" Animation : contains
+    Animation "1" -- "1" SourceImage : uses
+    Animation "1" -- "0..1" AnimatedVideo : produces
+    Animation "1" -- "1" AnimationConfig : configuredBy
+    SourceImage "1" -- "*" PreprocessedImage : generates
+    AIServiceManager "1" -- "*" AIService : manages
+    AIService <|-- StableVideoDiffusionService : implements
+    AIService <|-- PikaLabsService : implements
+    AIService <|-- ColabNotebookService : implements
+    AnimationQueue -- ProcessingWorker : assignsTo
+    ProcessingWorker -- AIService : uses
+    Animation -- AnimationQueue : enqueuedIn
